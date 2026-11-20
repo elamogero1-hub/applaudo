@@ -1,0 +1,124 @@
+{
+  "mode": "offline_adapter",
+  "scenarios": [
+    {
+      "name": "variable_bootstrap",
+      "status": "PASS",
+      "details": []
+    },
+    {
+      "name": "variable_bootstrap_invalida",
+      "status": "PASS",
+      "details": []
+    },
+    {
+      "name": "configuracion_en_ejecucion",
+      "status": "PASS",
+      "details": []
+    },
+    {
+      "name": "configuracion_ausente",
+      "status": "PASS",
+      "details": []
+    },
+    {
+      "name": "multiples_fuentes",
+      "status": "PASS",
+      "details": []
+    },
+    {
+      "name": "staging_particionado",
+      "status": "PASS",
+      "details": []
+    },
+    {
+      "name": "vista_directa_columnas_minusculas",
+      "status": "PASS",
+      "details": []
+    },
+    {
+      "name": "job_id_compatible",
+      "status": "PASS",
+      "details": []
+    },
+    {
+      "name": "identidad",
+      "status": "PASS",
+      "details": []
+    },
+    {
+      "name": "sql_parametrizado",
+      "status": "PASS",
+      "details": []
+    },
+    {
+      "name": "identificadores_invalidos",
+      "status": "PASS",
+      "details": []
+    },
+    {
+      "name": "transformaciones_en_bigquery",
+      "status": "PASS",
+      "details": []
+    },
+    {
+      "name": "sin_reenvios",
+      "status": "PASS",
+      "details": []
+    },
+    {
+      "name": "rejected_sin_archivos",
+      "status": "PASS",
+      "details": []
+    },
+    {
+      "name": "archivo_vacio_omitido",
+      "status": "PASS",
+      "details": []
+    },
+    {
+      "name": "archivo_vacio_generado",
+      "status": "PASS",
+      "details": []
+    },
+    {
+      "name": "csv_y_paginacion",
+      "status": "PASS",
+      "details": []
+    },
+    {
+      "name": "conteo_incorrecto",
+      "status": "PASS",
+      "details": []
+    },
+    {
+      "name": "falla_entrega",
+      "status": "PASS",
+      "details": []
+    },
+    {
+      "name": "reintento_publicacion",
+      "status": "PASS",
+      "details": []
+    },
+    {
+      "name": "configuracion_inicial",
+      "status": "PASS",
+      "details": []
+    },
+    {
+      "name": "orquestamiento",
+      "status": "PASS",
+      "details": []
+    }
+  ],
+  "pending": [
+    "Esquema, tipos, deduplicacion, calidad y REJECTED deben validarse con run_cloud_tests.py: ahora se ejecutan en SQL.",
+    "SFTP, ZIP y MERGE/versionado siguen pendientes."
+  ],
+  "summary": {
+    "total": 22,
+    "failed": 0,
+    "passed": 22
+  }
+}

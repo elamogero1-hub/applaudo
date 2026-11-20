@@ -1,0 +1,7 @@
+{
+  "project": "gsw-analytics-sandbox",
+  "dataset": "test_zuora",
+  "table": "control_panel",
+  "location": "US",
+  "connection_id": "google_cloud_default"
+}
