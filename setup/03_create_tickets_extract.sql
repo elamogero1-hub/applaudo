@@ -1,7 +1,6 @@
--- Initial structure derived from the source view. No dependency on the old extract.
--- No source rows are loaded here: the DAG performs the first controlled load.
--- IF NOT EXISTS never replaces a previously initialized table or its states.
-CREATE TABLE IF NOT EXISTS `gsw-analytics-sandbox.test_zuora.tickets_extract_hist`
+-- Initial structure derived from the source view.
+-- No source rows are loaded here: the DAG performs the controlled load.
+CREATE TABLE IF NOT EXISTS `gsw-analytics-sandbox.app_integration_zuora.tickets_extract_hist`
 CLUSTER BY invoice_line_id, line_status, sent_run_id AS
 SELECT
   CAST(NULL AS INT64) AS run_id,
@@ -56,6 +55,7 @@ SELECT
   CAST(f.`Admission_Fee` AS FLOAT64) AS `admission_fee`,
   CAST(f.`Amenities` AS STRING) AS `amenities`,
   CAST(f.`Season_start_date` AS DATE) AS `season_start_date`,
+  CAST(NULL AS STRING) AS `authorization_code`,
   CAST(NULL AS STRING) AS line_status,
   CAST(NULL AS INT64) AS sent_run_id,
   CAST(NULL AS TIMESTAMP) AS sent_at,
@@ -67,12 +67,3 @@ SELECT
   CAST(NULL AS STRING) AS checksum
 FROM `gsw-analytics-warehouse-prod.dev_zuora.ticketmaster_tickets` f
 WHERE FALSE;
-
--- One batched schema update for a table created by a partial/previous installation.
-ALTER TABLE `gsw-analytics-sandbox.test_zuora.tickets_extract_hist`
- ADD COLUMN IF NOT EXISTS job_id STRING,
- ADD COLUMN IF NOT EXISTS execution_id STRING,
- ADD COLUMN IF NOT EXISTS file_type STRING,
- ADD COLUMN IF NOT EXISTS file_name STRING,
- ADD COLUMN IF NOT EXISTS destination_uri STRING,
- ADD COLUMN IF NOT EXISTS checksum STRING;
