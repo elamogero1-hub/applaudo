@@ -1,2 +1,27 @@
+# Python bytecode & virtual environments
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.pytest_cache/
+
+# Test & runtime reports
+cloud_report.json
+scenario_report.json
+*.log
+*.tmp
+
+# Credentials & local secrets (never commit!)
+*.pem
+*credentials*.json
+*service_account*.json
+.env
+.env.*
+
+# IDE & OS metadata
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

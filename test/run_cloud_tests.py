@@ -32,7 +32,7 @@ def runtime(project, dataset, location, bq, gcs):
     class GCSHook:
         def __init__(self, **kwargs): pass
         def get_conn(self): return gcs
-    path = ROOT / 'airflow/dags_tickets_test.py'
+    path = ROOT / 'airflow/dags_tickets_v2.py'
     tree = ast.parse(path.read_text(encoding='utf-8-sig'))
     nodes = [n for n in tree.body if not isinstance(n, ast.With)
         and not (isinstance(n, ast.ImportFrom) and (n.module or '').startswith('airflow'))]
@@ -60,7 +60,7 @@ def main():
     parser = argparse.ArgumentParser(description='Real cloud tests: creates synthetic fixtures and publishes to GCS test/zuora/.')
     parser.add_argument('--project', required=True)
     parser.add_argument('--bucket', required=True)
-    parser.add_argument('--dataset', default='test_zuora_test')
+    parser.add_argument('--dataset', default='app_integration_zuora_test')
     parser.add_argument('--location', default='US')
     parser.add_argument('--scenario', choices=['all'] + list(SCENARIOS), default='all')
     parser.add_argument('--prepare-only', action='store_true', help='Create fixtures/configs, then trigger the DAG manually in Composer')
@@ -77,11 +77,11 @@ def main():
     existing = bq.create_dataset(dataset, exists_ok=True)
     if existing.location.upper() != args.location.upper():
         raise ValueError(f'Dataset location is {existing.location}, expected {args.location}')
-    setup = (ROOT / 'setup/setup_control_tables.sql').read_text(encoding='utf-8-sig')
-    setup = setup.replace('gsw-analytics-sandbox.test_zuora.', f'{args.project}.{args.dataset}.')
+    setup = (ROOT / 'setup/01_setup_control_tables.sql').read_text(encoding='utf-8-sig')
+    setup = setup.replace('gsw-analytics-sandbox.app_integration_zuora', f'{args.project}.{args.dataset}')
     bq.query(setup).result()
-    procedure = (ROOT / 'setup/deploy_zuora_procedure.sql').read_text(encoding='utf-8-sig')
-    procedure = procedure.replace('gsw-analytics-sandbox.test_zuora', f'{args.project}.{args.dataset}')
+    procedure = (ROOT / 'setup/04_deploy_zuora_procedure.sql').read_text(encoding='utf-8-sig')
+    procedure = procedure.replace('gsw-analytics-sandbox.app_integration_zuora', f'{args.project}.{args.dataset}')
     bq.query(procedure).result()
     ns = runtime(args.project, args.dataset, args.location, bq, gcs)
     session = datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S') + '_' + uuid.uuid4().hex[:8]

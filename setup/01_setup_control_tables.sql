@@ -1,5 +1,8 @@
--- Run manually in the US location after confirming dataset location.
-CREATE TABLE IF NOT EXISTS `gsw-analytics-sandbox.test_zuora.control_panel` (
+-- Run in BigQuery (US location) to initialize the dataset and control/staging tables.
+CREATE SCHEMA IF NOT EXISTS `gsw-analytics-sandbox.app_integration_zuora`
+OPTIONS(location = 'US');
+
+CREATE TABLE IF NOT EXISTS `gsw-analytics-sandbox.app_integration_zuora.control_panel` (
   job_id STRING NOT NULL, config_version INT64 NOT NULL, enabled BOOL NOT NULL,
   source_project STRING NOT NULL, source_dataset STRING NOT NULL,
   source_object STRING NOT NULL, source_type STRING NOT NULL, source_location STRING NOT NULL,
@@ -15,7 +18,7 @@ CREATE TABLE IF NOT EXISTS `gsw-analytics-sandbox.test_zuora.control_panel` (
   sample_rows_per_type INT64
 );
 
-CREATE TABLE IF NOT EXISTS `gsw-analytics-sandbox.test_zuora.control_panel_detail` (
+CREATE TABLE IF NOT EXISTS `gsw-analytics-sandbox.app_integration_zuora.control_panel_detail` (
   job_id STRING NOT NULL, execution_id STRING NOT NULL,
   record_type STRING NOT NULL, file_type STRING,
   airflow_dag_id STRING NOT NULL, airflow_run_id STRING NOT NULL,
@@ -31,8 +34,8 @@ CREATE TABLE IF NOT EXISTS `gsw-analytics-sandbox.test_zuora.control_panel_detai
 PARTITION BY business_date
 CLUSTER BY job_id, execution_id;
 
--- Generic per-execution staging.
-CREATE TABLE IF NOT EXISTS `gsw-analytics-sandbox.test_zuora.tickets_extract_stg` (
+-- Multi-source per-execution staging.
+CREATE TABLE IF NOT EXISTS `gsw-analytics-sandbox.app_integration_zuora.tickets_extract_stg` (
  job_id STRING NOT NULL, execution_id STRING NOT NULL,
  captured_at TIMESTAMP NOT NULL, capture_date DATE NOT NULL, source_record JSON,
  prepared_record JSON, line_status STRING, sent_run_id INT64, sent_at TIMESTAMP
@@ -41,8 +44,8 @@ PARTITION BY capture_date
 CLUSTER BY job_id, execution_id
 OPTIONS(require_partition_filter = TRUE);
 
--- Whole-batch quarantine: every captured row is retained, not only invalid rows.
-CREATE TABLE IF NOT EXISTS `gsw-analytics-sandbox.test_zuora.tickets_extract_reject` (
+-- Whole-batch quality quarantine.
+CREATE TABLE IF NOT EXISTS `gsw-analytics-sandbox.app_integration_zuora.tickets_extract_reject` (
  job_id STRING NOT NULL, execution_id STRING NOT NULL,
  captured_at TIMESTAMP NOT NULL, capture_date DATE NOT NULL,
  rejected_at TIMESTAMP NOT NULL, reject_scope STRING NOT NULL,
@@ -51,25 +54,3 @@ CREATE TABLE IF NOT EXISTS `gsw-analytics-sandbox.test_zuora.tickets_extract_rej
 PARTITION BY capture_date
 CLUSTER BY job_id, execution_id
 OPTIONS(require_partition_filter = TRUE);
-
--- Resume-safe schema alignment for existing installations.
-ALTER TABLE `gsw-analytics-sandbox.test_zuora.control_panel`
- ADD COLUMN IF NOT EXISTS sample_rows_per_type INT64;
-ALTER TABLE `gsw-analytics-sandbox.test_zuora.control_panel_detail`
- ADD COLUMN IF NOT EXISTS quality_validation_result JSON,
- ADD COLUMN IF NOT EXISTS source_snapshot_at TIMESTAMP,
- ADD COLUMN IF NOT EXISTS source_rows INT64;
-ALTER TABLE `gsw-analytics-sandbox.test_zuora.tickets_extract_stg`
- ADD COLUMN IF NOT EXISTS prepared_record JSON,
- ADD COLUMN IF NOT EXISTS line_status STRING,
- ADD COLUMN IF NOT EXISTS sent_run_id INT64,
- ADD COLUMN IF NOT EXISTS sent_at TIMESTAMP;
-
--- Remove obsolete columns and monitoring view if present from prior versions.
-ALTER TABLE `gsw-analytics-sandbox.test_zuora.control_panel`
- DROP COLUMN IF EXISTS schema_error_action,
- DROP COLUMN IF EXISTS data_error_action,
- DROP COLUMN IF EXISTS process_type,
- DROP COLUMN IF EXISTS delivery_job_id;
-
-DROP VIEW IF EXISTS `gsw-analytics-sandbox.test_zuora.vw_zuora_job_status`;
