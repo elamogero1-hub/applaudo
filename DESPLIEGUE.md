@@ -6,6 +6,8 @@
 
 Esta guía detalla el paso a paso para desplegar, ejecutar, monitorear y escalar la solución en el dataset **`gsw-analytics-sandbox.app_integration_zuora`** y en **Cloud Composer**.
 
+![Integrating GCP with Zuora - Data Architecture v2](./assets/architecture_gcp_zuora.svg)
+
 > [!TIP]
 > Todos los archivos de la carpeta [`setup/`](./setup/) están numerados (`01_` al `04_`) en el orden exacto en que deben ejecutarse en BigQuery.
 

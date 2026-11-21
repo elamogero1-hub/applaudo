@@ -1,0 +1,226 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1360 760" width="100%" height="100%" font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif">
+  <defs>
+    <filter id="shadow" x="-4%" y="-4%" width="108%" height="112%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#0f172a" flood-opacity="0.10"/>
+    </filter>
+    <filter id="cardShadow" x="-3%" y="-3%" width="106%" height="110%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#0f172a" flood-opacity="0.08"/>
+    </filter>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#f1f5f9"/>
+    </linearGradient>
+    <linearGradient id="gcpGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="100%" stop-color="#dbeafe"/>
+    </linearGradient>
+    <linearGradient id="awsGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fffbeb"/>
+      <stop offset="100%" stop-color="#fef3c7"/>
+    </linearGradient>
+    <linearGradient id="zuoraGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#faf5ff"/>
+      <stop offset="100%" stop-color="#f3e8ff"/>
+    </linearGradient>
+    <linearGradient id="srcGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#e2e8f0"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#64748b"/>
+    </marker>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#2563eb"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1360" height="760" rx="14" fill="url(#bgGrad)"/>
+
+  <!-- Header -->
+  <text x="36" y="48" font-size="30" font-weight="800" fill="#0f172a">Integrating GCP with Zuora</text>
+  <text x="36" y="76" font-size="18" font-weight="500" fill="#475569">Zuora Tickets • Metadata-Driven Multi-Source ELT Pipeline v2 (<tspan font-family="Consolas, monospace" font-size="16" fill="#2563eb">app_integration_zuora</tspan>)</text>
+
+  <!-- ==================== 1. SOURCE SYSTEM ==================== -->
+  <rect x="30" y="102" width="180" height="625" rx="10" fill="url(#srcGrad)" stroke="#cbd5e1" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="120" y="132" text-anchor="middle" font-size="14" font-weight="700" fill="#334155" letter-spacing="0.8">SOURCE SYSTEM</text>
+
+  <rect x="44" y="290" width="152" height="215" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" filter="url(#cardShadow)"/>
+  <text x="120" y="330" text-anchor="middle" font-size="15" font-weight="800" font-style="italic" fill="#0f172a">TICKETMASTER</text>
+  <line x1="60" y1="344" x2="180" y2="344" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="56" y="368" font-size="11.5" fill="#334155">• Ticketmaster API /</text>
+  <text x="64" y="384" font-size="11.5" fill="#334155">Hook</text>
+  <text x="56" y="406" font-size="11.5" fill="#334155">• Sales &amp; Order Data</text>
+  <text x="56" y="428" font-size="11.5" fill="#334155">• Event &amp; Season</text>
+  <text x="64" y="444" font-size="11.5" fill="#334155">Schedules</text>
+  <text x="56" y="468" font-size="11" font-weight="600" fill="#2563eb">• + Futuras Fuentes</text>
+
+  <!-- ==================== 2. GOOGLE CLOUD ==================== -->
+  <rect x="242" y="102" width="535" height="625" rx="10" fill="url(#gcpGrad)" stroke="#93c5fd" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="510" y="130" text-anchor="middle" font-size="14" font-weight="700" fill="#1e3a8a" letter-spacing="0.8">GOOGLE CLOUD</text>
+
+  <!-- 2A. Upstream GCP Project (gsw-analytics-warehouse-prod) -->
+  <rect x="258" y="146" width="503" height="94" rx="8" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.5" filter="url(#cardShadow)"/>
+  <circle cx="278" cy="168" r="7" fill="#ea4335"/>
+  <circle cx="290" cy="168" r="7" fill="#4285f4" fill-opacity="0.85"/>
+  <text x="306" y="173" font-size="13.5" font-weight="700" fill="#0f172a">GCP Project (<tspan font-family="Consolas, monospace" font-size="12.5" fill="#1d4ed8">gsw-analytics-warehouse-prod</tspan>)</text>
+
+  <rect x="274" y="186" width="130" height="40" rx="6" fill="#eff6ff" stroke="#93c5fd" stroke-width="1"/>
+  <circle cx="294" cy="206" r="10" fill="#2563eb"/>
+  <text x="294" y="210" text-anchor="middle" font-size="10" font-weight="700" fill="#ffffff">BQ</text>
+  <text x="312" y="211" font-size="13" font-weight="700" fill="#1e3a8a">BigQuery</text>
+
+  <rect x="416" y="186" width="328" height="40" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="580" y="204" text-anchor="middle" font-size="11.5" font-weight="700" fill="#0f172a">Source View: <tspan font-family="Consolas, monospace" font-weight="600" fill="#1d4ed8">dev_zuora.ticketmaster_tickets</tspan></text>
+  <text x="580" y="219" text-anchor="middle" font-size="10.5" fill="#475569">(52 cols incl. authorization_code + vistas multi-fuente)</text>
+
+  <!-- 2B. Sandbox GCP Project (gsw-analytics-sandbox) -->
+  <rect x="258" y="264" width="503" height="332" rx="8" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.5" filter="url(#cardShadow)"/>
+  <circle cx="278" cy="286" r="7" fill="#fbbc05"/>
+  <circle cx="290" cy="286" r="7" fill="#34a853" fill-opacity="0.85"/>
+  <text x="306" y="291" font-size="13.5" font-weight="700" fill="#0f172a">GCP Project (<tspan font-family="Consolas, monospace" font-size="12.5" fill="#1d4ed8">gsw-analytics-sandbox.app_integration_zuora</tspan>)</text>
+
+  <!-- Left box inside Sandbox: Data Warehouse (DWH) - BigQuery -->
+  <rect x="272" y="304" width="242" height="278" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.2"/>
+  <text x="393" y="324" text-anchor="middle" font-size="12.5" font-weight="800" fill="#0f172a">Data Warehouse (DWH) – BigQuery</text>
+  <text x="393" y="341" text-anchor="middle" font-size="11" font-weight="700" fill="#2563eb">Metadata-Driven ELT Engine</text>
+
+  <!-- Item 1: 3 Decoupled Stored Procedures -->
+  <rect x="282" y="352" width="222" height="72" rx="6" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="290" y="368" font-size="11.5" font-weight="700" fill="#0f172a">1) 3 Decoupled SPs (5 params c/u)</text>
+  <text x="290" y="383" font-size="10.5" font-family="Consolas, monospace" fill="#1d4ed8">• sp_prepare_extraction</text>
+  <text x="290" y="397" font-size="10.5" font-family="Consolas, monospace" fill="#1d4ed8">• sp_finalize_delivery</text>
+  <text x="290" y="411" font-size="10.5" font-family="Consolas, monospace" fill="#1d4ed8">• sp_fail_execution</text>
+
+  <!-- Item 2: Control Panel -->
+  <rect x="282" y="431" width="222" height="68" rx="6" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="290" y="447" font-size="11.5" font-weight="700" fill="#0f172a">2) Control &amp; Audit Tables</text>
+  <text x="290" y="462" font-size="10.5" font-family="Consolas, monospace" fill="#0f172a">• control_panel (1 fila/job_id)</text>
+  <text x="290" y="476" font-size="10.5" font-family="Consolas, monospace" fill="#0f172a">• control_panel_detail (RUN/FILE)</text>
+  <text x="290" y="490" font-size="10" fill="#475569">Dynamic config &amp; tickets_bootstrap.json</text>
+
+  <!-- Item 3: Normalized Staging & History -->
+  <rect x="282" y="506" width="222" height="68" rx="6" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="290" y="522" font-size="11.5" font-weight="700" fill="#0f172a">3) Stage, Quarantine &amp; History</text>
+  <text x="290" y="537" font-size="10.5" font-family="Consolas, monospace" fill="#0f172a">• tickets_extract_stg (JSON)</text>
+  <text x="290" y="551" font-size="10.5" font-family="Consolas, monospace" fill="#0f172a">• tickets_extract_reject</text>
+  <text x="290" y="565" font-size="10.5" font-family="Consolas, monospace" fill="#0f172a">• tickets_extract_hist (SENT)</text>
+
+  <!-- Right box inside Sandbox: Cloud Storage (GCS) -->
+  <rect x="530" y="304" width="218" height="278" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.2"/>
+  <text x="639" y="324" text-anchor="middle" font-size="12.5" font-weight="800" fill="#0f172a">Cloud Storage (GCS)</text>
+
+  <rect x="619" y="336" width="40" height="32" rx="6" fill="#2563eb"/>
+  <line x1="627" y1="347" x2="651" y2="347" stroke="#ffffff" stroke-width="2.5"/>
+  <line x1="627" y1="356" x2="651" y2="356" stroke="#ffffff" stroke-width="2.5"/>
+
+  <text x="639" y="384" text-anchor="middle" font-size="11" font-weight="700" fill="#0f172a">Cloud Storage Outbox Bucket:</text>
+  <text x="639" y="399" text-anchor="middle" font-size="10" font-family="Consolas, monospace" fill="#1d4ed8">gs://gsw-composer-gh/</text>
+  <text x="639" y="412" text-anchor="middle" font-size="10" font-family="Consolas, monospace" fill="#1d4ed8">data/output/YYYY/MM/DD/</text>
+
+  <!-- CSV File 1 -->
+  <rect x="544" y="426" width="190" height="48" rx="6" fill="#ffffff" stroke="#93c5fd" stroke-width="1.2" filter="url(#cardShadow)"/>
+  <text x="639" y="446" text-anchor="middle" font-size="10.5" font-family="Consolas, monospace" font-weight="700" fill="#0f172a">GSW_TICKETS_INV_</text>
+  <text x="639" y="462" text-anchor="middle" font-size="10.5" font-family="Consolas, monospace" font-weight="700" fill="#2563eb">{execution_id}.csv</text>
+
+  <!-- CSV File 2 -->
+  <rect x="544" y="484" width="190" height="48" rx="6" fill="#ffffff" stroke="#93c5fd" stroke-width="1.2" filter="url(#cardShadow)"/>
+  <text x="639" y="504" text-anchor="middle" font-size="10.5" font-family="Consolas, monospace" font-weight="700" fill="#0f172a">GSW_TICKETS_CM_</text>
+  <text x="639" y="520" text-anchor="middle" font-size="10.5" font-family="Consolas, monospace" font-weight="700" fill="#2563eb">{execution_id}.csv</text>
+
+  <text x="639" y="554" text-anchor="middle" font-size="10.5" font-weight="600" fill="#334155">SHA-256 &amp; Exclusive Create</text>
+  <text x="639" y="569" text-anchor="middle" font-size="10" fill="#475569">(if_generation_match=0 / .tmp → .csv)</text>
+
+  <!-- Arrow DWH to GCS -->
+  <line x1="514" y1="443" x2="528" y2="443" stroke="#2563eb" stroke-width="2" marker-end="url(#arrowBlue)"/>
+
+  <!-- 2C. Orchestration, Security & Observability -->
+  <rect x="258" y="612" width="503" height="102" rx="8" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.5" filter="url(#cardShadow)"/>
+  <text x="510" y="632" text-anchor="middle" font-size="12.5" font-weight="800" fill="#0f172a">Orchestration, Security &amp; Observability (<tspan font-family="Consolas, monospace" font-size="11.5" fill="#1d4ed8">gsw-analytics-automation-prod</tspan>)</text>
+
+  <!-- 4 Service Pillars -->
+  <text x="320" y="668" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1e3a8a">Cloud Composer</text>
+  <text x="320" y="684" text-anchor="middle" font-size="10.5" fill="#475569">(dags_tickets_v2.py)</text>
+  <text x="320" y="698" text-anchor="middle" font-size="10" fill="#2563eb">2 Tasks Pipeline</text>
+
+  <text x="450" y="668" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1e3a8a">Airflow Connections</text>
+  <text x="450" y="684" text-anchor="middle" font-size="10.5" fill="#475569">&amp; Variables</text>
+  <text x="450" y="698" text-anchor="middle" font-size="10" fill="#475569">(tickets_bootstrap)</text>
+
+  <text x="580" y="668" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1e3a8a">Cloud Logging</text>
+  <text x="580" y="684" text-anchor="middle" font-size="10.5" fill="#475569">&amp; Audit Detail</text>
+  <text x="580" y="698" text-anchor="middle" font-size="10" fill="#475569">(RUN / FILE Status)</text>
+
+  <text x="698" y="668" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1e3a8a">Cloud IAM</text>
+  <text x="698" y="684" text-anchor="middle" font-size="10.5" fill="#475569">(Least-Privilege</text>
+  <text x="698" y="698" text-anchor="middle" font-size="10" fill="#475569">Composer SA)</text>
+
+  <!-- ==================== 3. GOLDEN STATE (AWS) ==================== -->
+  <rect x="812" y="102" width="175" height="625" rx="10" fill="url(#awsGrad)" stroke="#fcd34d" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="900" y="130" text-anchor="middle" font-size="13.5" font-weight="700" fill="#92400e" letter-spacing="0.6">GOLDEN STATE</text>
+  <text x="900" y="148" text-anchor="middle" font-size="13" font-weight="700" fill="#92400e">(AWS)</text>
+
+  <rect x="828" y="340" width="143" height="145" rx="8" fill="#ffffff" stroke="#fbbf24" stroke-width="1.5" filter="url(#cardShadow)"/>
+  <rect x="876" y="356" width="48" height="34" rx="4" fill="#f59e0b"/>
+  <text x="900" y="416" text-anchor="middle" font-size="15" font-weight="800" fill="#0f172a">SFTP</text>
+  <text x="838" y="440" font-size="10.5" fill="#334155">• Host:</text>
+  <text x="844" y="454" font-size="10" font-family="Consolas, monospace" fill="#92400e">sftp.gswarriors.com</text>
+  <text x="838" y="472" font-size="10.5" fill="#334155">• Secure Landing Zone</text>
+
+  <!-- ==================== 4. ZUORA APPLICATION ==================== -->
+  <rect x="1020" y="102" width="180" height="625" rx="10" fill="url(#zuoraGrad)" stroke="#d8b4fe" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="1110" y="130" text-anchor="middle" font-size="13.5" font-weight="700" fill="#581c87" letter-spacing="0.6">ZUORA</text>
+  <text x="1110" y="148" text-anchor="middle" font-size="13" font-weight="700" fill="#581c87">APPLICATION</text>
+
+  <rect x="1034" y="315" width="152" height="195" rx="8" fill="#ffffff" stroke="#c084fc" stroke-width="1.5" filter="url(#cardShadow)"/>
+  <text x="1110" y="358" text-anchor="middle" font-size="22" font-weight="900" fill="#0f766e" letter-spacing="1.5">ZUORA</text>
+  <text x="1110" y="380" text-anchor="middle" font-size="11.5" font-weight="700" fill="#0f172a">Zuora Billing &amp; Revenue</text>
+  <line x1="1048" y1="392" x2="1172" y2="392" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="1044" y="414" font-size="11" fill="#334155">• Consumes Invoices</text>
+  <text x="1052" y="429" font-size="11" font-weight="600" fill="#0f172a">(INV)</text>
+  <text x="1044" y="450" font-size="11" fill="#334155">• Consumes Credit</text>
+  <text x="1052" y="465" font-size="11" font-weight="600" fill="#0f172a">Memos (CM)</text>
+  <text x="1044" y="488" font-size="11" fill="#334155">• Billing &amp; Revenue</text>
+  <text x="1052" y="502" font-size="11" fill="#334155">Subledger</text>
+
+  <!-- ==================== 5. NETSUITE ==================== -->
+  <rect x="1228" y="340" width="112" height="145" rx="8" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5" filter="url(#cardShadow)"/>
+  <text x="1284" y="382" text-anchor="middle" font-size="15" font-weight="800" fill="#0f172a">NETSUITE</text>
+  <line x1="1240" y1="396" x2="1328" y2="396" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="1284" y="420" text-anchor="middle" font-size="11.5" font-weight="700" fill="#334155">NetSuite</text>
+  <text x="1284" y="438" text-anchor="middle" font-size="10.5" fill="#475569">(ERP &amp; General</text>
+  <text x="1284" y="453" text-anchor="middle" font-size="10.5" fill="#475569">Ledger)</text>
+
+  <!-- ==================== RED DASHED SCOPE BOUNDARY ==================== -->
+  <rect x="250" y="254" width="730" height="350" rx="10" fill="none" stroke="#dc2626" stroke-width="2" stroke-dasharray="7,5"/>
+  <rect x="895" y="242" width="66" height="22" rx="4" fill="#fef2f2"/>
+  <text x="928" y="258" text-anchor="middle" font-size="13" font-weight="800" fill="#dc2626" letter-spacing="1">SCOPE</text>
+
+  <!-- ==================== CONNECTING ARROWS ==================== -->
+  <!-- Ticketmaster -> GCP -->
+  <line x1="196" y1="412" x2="254" y2="412" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="225" y="382" text-anchor="middle" font-size="10.5" font-weight="600" fill="#334155">Ingest</text>
+  <text x="225" y="395" text-anchor="middle" font-size="10.5" font-weight="600" fill="#334155">Ticket</text>
+  <text x="225" y="408" text-anchor="middle" font-size="10.5" font-weight="600" fill="#334155">Sales</text>
+
+  <!-- Source View -> Sandbox DWH -->
+  <line x1="510" y1="240" x2="510" y2="262" stroke="#2563eb" stroke-width="2" marker-end="url(#arrowBlue)"/>
+
+  <!-- GCS -> SFTP -->
+  <line x1="748" y1="412" x2="824" y2="412" stroke="#2563eb" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <text x="794" y="392" text-anchor="middle" font-size="10.5" font-weight="600" fill="#1e3a8a">Secure</text>
+  <text x="794" y="405" text-anchor="middle" font-size="10.5" font-weight="600" fill="#1e3a8a">Export</text>
+
+  <!-- SFTP -> Zuora -->
+  <line x1="971" y1="412" x2="1030" y2="412" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="1002" y="382" text-anchor="middle" font-size="10.5" font-weight="600" fill="#334155">Ingest</text>
+  <text x="1002" y="395" text-anchor="middle" font-size="10.5" font-weight="600" fill="#334155">CSVs</text>
+  <text x="1002" y="408" text-anchor="middle" font-size="10.5" font-weight="600" fill="#334155">via SFTP</text>
+
+  <!-- Zuora -> NetSuite -->
+  <line x1="1186" y1="412" x2="1224" y2="412" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="1205" y="370" text-anchor="middle" font-size="10" font-weight="600" fill="#334155">GL &amp;</text>
+  <text x="1205" y="383" text-anchor="middle" font-size="10" font-weight="600" fill="#334155">Revenue</text>
+  <text x="1205" y="396" text-anchor="middle" font-size="10" font-weight="600" fill="#334155">Sync</text>
+</svg>
+
