@@ -10,7 +10,7 @@ from types import SimpleNamespace
 from unittest.mock import Mock
 
 ROOT = Path(__file__).resolve().parents[1]
-DAG_FILE = ROOT / 'airflow/dags_tickets_test.py'
+DAG_FILE = ROOT / 'airflow/dags_tickets_v2.py'
 TREE = ast.parse(DAG_FILE.read_text(encoding='utf-8-sig'))
 NODES = [n for n in TREE.body if not isinstance(n, ast.With)
     and not (isinstance(n, ast.ImportFrom) and (n.module or '').startswith('airflow'))]
@@ -71,19 +71,19 @@ class Checks(unittest.TestCase):
     def test_all_sql_stages_render_with_bound_parameters(self):
         hook = Mock(); hook.insert_job.return_value.result.return_value = []
         self.ns['BigQueryHook'] = Mock(return_value=hook)
-        stages = ('configure','validate_source','capture_source','extract','prepare_batches',
-                  'files','finalize_file','close_run','fail_run')
+        stages = ('prepare', 'files', 'finalize_file', 'fail_run')
         for stage in stages:
             self.ns['sql'](stage, request(), row_count=0, file_type="untrusted_'",
                            checksum='sha', error_step='step', error_message='message')
-        self.assertEqual(hook.insert_job.call_count, 9)
+        self.assertEqual(hook.insert_job.call_count, 4)
         for call in hook.insert_job.call_args_list:
             query = call.kwargs['configuration']['query']
             self.assertNotIn('{{', query['query'])
             self.assertNotIn("untrusted_'", query['query'])
             self.assertEqual(set(re.findall(r'@p_(\w+)', query['query'])),
                 {p['name'][2:] for p in query['queryParameters']})
-        self.assertIn('`sandbox.test_zuora.sp_zuora_tickets`', hook.insert_job.call_args.kwargs['configuration']['query']['query'])
+            self.assertEqual(len(query['queryParameters']), 5)
+        self.assertIn('`sandbox.test_zuora.sp_fail_execution`', hook.insert_job.call_args.kwargs['configuration']['query']['query'])
 
     def test_bootstrap_variable_is_read_only_when_called(self):
         value = dict(project='sandbox', dataset='test_zuora', table='control_panel',
@@ -130,8 +130,9 @@ class Checks(unittest.TestCase):
 
     def test_missing_runtime_configuration_stops_execution(self):
         self.ns['sql'] = Mock(return_value=[])
-        with self.assertRaisesRegex(RuntimeError, 'one frozen'):
-            self.ns['load_configuration'](request())
+        frozen = self.ns['load_configuration'](request())
+        self.assertEqual(frozen['status'], 'REJECTED')
+        self.assertEqual(frozen['files'], [])
 
     def test_multi_source_resolution_and_batch_execution(self):
         ctx = {'dag': SimpleNamespace(dag_id='test'), 'run_id': 'manual_multi',
@@ -171,9 +172,10 @@ class Checks(unittest.TestCase):
         self.assertNotIn('validate_config', names)
         self.assertNotIn('check_schema', names)
         self.assertNotIn('parse_config_list', names)
-        sql = (ROOT / 'setup/deploy_zuora_procedure.sql').read_text(encoding='utf-8-sig')
+        sql = (ROOT / 'setup/04_deploy_zuora_procedure.sql').read_text(encoding='utf-8-sig')
         self.assertNotRegex(sql, r"SELECT\s+'[^'\n]*'\s+WHERE")
-        for fragment in ('CREATE OR REPLACE PROCEDURE', 'tickets_extract_stg', 'capture_date =', 'SAFE_CAST', 'IS NOT DISTINCT FROM', 'configuration_validation',
+        for fragment in ('sp_prepare_extraction', 'sp_finalize_delivery', 'sp_fail_execution',
+                         'tickets_extract_stg', 'capture_date =', 'SAFE_CAST', 'IS NOT DISTINCT FROM',
                          'schema_validation', 'quality_validation', 'REJECTED', 'BEGIN TRANSACTION', 'v_types'):
             self.assertIn(fragment, sql)
 
@@ -257,27 +259,41 @@ class Checks(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, 'collision'):
                 self.ns['upload_csv'](path, file())
 
+    def test_sftp_destination_upload_and_collision_handling(self):
+        sftp = Mock()
+        sftp.__enter__ = Mock(return_value=sftp)
+        sftp.__exit__ = Mock(return_value=False)
+        sftp.stat.side_effect = FileNotFoundError()
+        sftp_plan = file(destination_type='SFTP', sftp_connection_id='zuora_sftp',
+                         destination_uri='sftp://zuora_sftp/data/input/2026/11/10/file.csv')
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / 'file.csv'; path.write_bytes(b'id\n1\n')
+            self.ns['upload_sftp'] = Mock(return_value=hashlib.sha256(b'id\n1\n').hexdigest())
+            digest = self.ns['upload_csv'](path, sftp_plan)
+            self.assertEqual(digest, hashlib.sha256(b'id\n1\n').hexdigest())
+            self.ns['upload_sftp'].assert_called_once()
+
     def test_initial_setup_contract_is_consistent(self):
-        seed = (ROOT / 'setup/seed_control_panel.sql').read_text(encoding='utf-8-sig')
-        initial = (ROOT / 'setup/create_tickets_extract.sql').read_text(encoding='utf-8-sig')
-        cols = re.findall(r"STRUCT\('([^']+)' AS source_column", seed)
-        self.assertEqual(len(cols), 51)
+        seed = (ROOT / 'setup/02_seed_control_panel.sql').read_text(encoding='utf-8-sig')
+        initial = (ROOT / 'setup/03_create_tickets_extract.sql').read_text(encoding='utf-8-sig')
+        cols = list(dict.fromkeys(re.findall(r"STRUCT\('([^']+)' AS source_column", seed)))
+        self.assertEqual(len(cols), 52)
+        self.assertIn('authorization_code', cols)
         for col in cols: self.assertIn(f'AS `{col.lower()}`', initial)
         self.assertIn('WHERE FALSE', initial)
         self.assertIn('TO_JSON(sm.schema_fields)', seed)
-        self.assertIn("'Invoice_Line_ID,Ext_Sell_Price', 'INV,CM'", seed)
-        setup = (ROOT / 'setup/setup_control_tables.sql').read_text(encoding='utf-8-sig')
+        self.assertIn("'Invoice_Line_ID,Ext_Sell_Price'", seed)
+        setup = (ROOT / 'setup/01_setup_control_tables.sql').read_text(encoding='utf-8-sig')
         self.assertEqual(setup.count('job_id STRING NOT NULL'), 4)
         self.assertIn('CLUSTER BY job_id, execution_id', setup)
-        self.assertIn('(job_id, config_version', seed)
         self.assertIn(' AS run_id,', initial)
-        self.assertIn("STRUCT('run_id' AS name,'INT64' AS kind)", (ROOT / 'setup/deploy_zuora_procedure.sql').read_text(encoding='utf-8-sig'))
+        self.assertIn("STRUCT('run_id' AS name,'INT64' AS kind)", (ROOT / 'setup/04_deploy_zuora_procedure.sql').read_text(encoding='utf-8-sig'))
 
     def test_partitioned_staging_and_monitoring_are_explicit(self):
-        setup = (ROOT / 'setup/setup_control_tables.sql').read_text(encoding='utf-8-sig')
-        procedure = (ROOT / 'setup/deploy_zuora_procedure.sql').read_text(encoding='utf-8-sig')
+        setup = (ROOT / 'setup/01_setup_control_tables.sql').read_text(encoding='utf-8-sig')
+        procedure = (ROOT / 'setup/04_deploy_zuora_procedure.sql').read_text(encoding='utf-8-sig')
         self.assertFalse((ROOT / 'setup/create_monitoring_view.sql').exists())
-        self.assertIn('DROP VIEW IF EXISTS `gsw-analytics-sandbox.test_zuora.vw_zuora_job_status`', setup)
+        self.assertIn('CREATE SCHEMA IF NOT EXISTS `gsw-analytics-sandbox.app_integration_zuora`', setup)
         self.assertIn('PARTITION BY capture_date', setup)
         self.assertIn('CLUSTER BY job_id, execution_id', setup)
         self.assertIn('require_partition_filter = TRUE', setup)
@@ -288,18 +304,11 @@ class Checks(unittest.TestCase):
         self.assertIn('FROM_BASE64', procedure)
 
     def test_direct_view_simulation_and_lowercase_destination_schema(self):
-        initial = (ROOT / 'setup/create_tickets_extract.sql').read_text(encoding='utf-8-sig')
+        initial = (ROOT / 'setup/03_create_tickets_extract.sql').read_text(encoding='utf-8-sig')
         aliases = re.findall(r' AS `([^`]+)`', initial)
-        self.assertEqual(len(aliases), 51)
+        self.assertEqual(len(aliases), 52)
         self.assertTrue(all(name == name.lower() for name in aliases))
-        simulation = (ROOT / 'test/prepare_initial_from_view.sql').read_text(encoding='utf-8-sig')
-        self.assertNotIn('CREATE TABLE IF NOT EXISTS `gsw-analytics-sandbox.test_zuora.ticketmaster_initial_sample`', simulation)
-        self.assertIn('sample_rows_per_type', simulation)
-        self.assertIn("job_id = 'zuora_tickets'", simulation)
-        self.assertIn("'zuora_tickets_initial_simulation' AS job_id", simulation)
-        self.assertNotIn('CREATE TABLE', simulation)
-        self.assertIn('BEGIN TRANSACTION', simulation)
-        sql = (ROOT / 'setup/deploy_zuora_procedure.sql').read_text(encoding='utf-8-sig')
+        sql = (ROOT / 'setup/04_deploy_zuora_procedure.sql').read_text(encoding='utf-8-sig')
         self.assertIn('ROW_NUMBER() OVER', sql)
         self.assertIn('v_sample_rows', sql)
         self.assertIn('LOWER(source_column), output_column', sql)
