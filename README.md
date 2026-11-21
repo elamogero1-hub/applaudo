@@ -15,7 +15,8 @@ Pipeline corporativo **Multi-Fuente y Multi-Destino (`GCS` / `SFTP`)** gobernado
 
 ## 📑 Tabla de Contenidos
 
-- [🏗️ Arquitectura y Flujo](#-arquitectura-y-flujo)
+- [🏛️ Arquitectura de Datos End-to-End (GCP → Zuora)](#️-arquitectura-de-datos-end-to-end-gcp--zuora)
+- [🏗️ Flujo Técnico de Orquestación y Stored Procedures](#️-flujo-técnico-de-orquestación-y-stored-procedures)
 - [📂 Estructura del Repositorio](#-estructura-del-repositorio)
 - [🧩 Componentes en BigQuery](#-componentes-en-bigquery)
 - [⚙️ Guía Rápida de Despliegue](#️-guía-rápida-de-despliegue)
@@ -24,7 +25,25 @@ Pipeline corporativo **Multi-Fuente y Multi-Destino (`GCS` / `SFTP`)** gobernado
 
 ---
 
-## 🏗️ Arquitectura y Flujo
+## 🏛️ Arquitectura de Datos End-to-End (GCP → Zuora)
+
+![Integrating GCP with Zuora - Data Architecture v2](./assets/architecture_gcp_zuora.svg)
+
+### Capas de la Arquitectura Corporativa
+
+| Capa / Dominio | Sistema / Proyecto | Objetos Principales | Rol en la Arquitectura |
+|---|---|---|---|
+| **1. Source System** | **Ticketmaster** *(+ futuras fuentes)* | Ticketmaster API / Hook, Sales & Order Data, Event & Season Schedules | Sistema transaccional origen que genera las ventas de boletos, órdenes y calendarios de temporada. |
+| **2. Google Cloud (Origen)** | `gsw-analytics-warehouse-prod` | Vista BigQuery: `dev_zuora.ticketmaster_tickets` *(52 columnas incl. `authorization_code`)* | Capa semántica de lectura inmutable que expone los registros listos para extracción. |
+| **3. Google Cloud (Motor ELT – SCOPE)** | `gsw-analytics-sandbox`<br>Dataset: `app_integration_zuora` | **SPs**: `sp_prepare_extraction`, `sp_finalize_delivery`, `sp_fail_execution`<br>**Tablas**: `control_panel`, `control_panel_detail`, `tickets_extract_stg`, `tickets_extract_reject`, `tickets_extract_hist` | Motor ELT guiado por metadatos: valida esquema/calidad, aplica retenciones por temporada (`HOLD`), deduplica contra histórico y genera los lotes. |
+| **4. Google Cloud (Outbox – SCOPE)** | Cloud Storage (`gsw-composer-gh`) | `gs://gsw-composer-gh/data/output/YYYY/MM/DD/`<br>`GSW_TICKETS_INV_{execution_id}.csv`<br>`GSW_TICKETS_CM_{execution_id}.csv` | Zona de publicación de archivos CSV con verificación `SHA-256` y creación exclusiva (`if_generation_match=0`). |
+| **5. Orquestación y Seguridad** | `gsw-analytics-automation-prod` | Cloud Composer (`dags_tickets_v2.py`), Airflow Variables (`tickets_bootstrap`), Cloud Logging, Cloud IAM | Orquestación en 2 tareas (`prepare_batches >> publish_files`), gestión de credenciales y observabilidad. |
+| **6. Golden State AWS (SCOPE)** | **SFTP Landing Zone** | `sftp.gswarriors.com` (`/data/input`) | Zona de aterrizaje segura con escritura atómica (`.tmp` → `.csv`) para ingesta hacia Zuora. |
+| **7. Zuora & NetSuite (Downstream)** | **Zuora Billing & Revenue** → **NetSuite ERP** | Invoices (`INV`), Credit Memos (`CM`), Revenue Subledger & General Ledger | Consumo de facturas/notas de crédito en Zuora y sincronización contable hacia NetSuite. |
+
+---
+
+## 🏗️ Flujo Técnico de Orquestación y Stored Procedures
 
 El flujo en Airflow se compone únicamente de **2 tareas (`prepare_batches >> publish_files`)** que invocan **3 procedimientos almacenados de responsabilidad única** (5 parámetros cada uno):
 
@@ -79,6 +98,8 @@ flowchart LR
 gsw_airflow_bq_to_cs/
 ├── 📂 airflow/
 │   └── 🐍 dags_tickets_v2.py             # DAG autocontenido (prepare_batches >> publish_files)
+├── 📂 assets/
+│   └── 🖼️ architecture_gcp_zuora.svg     # Diagrama oficial de Arquitectura de Datos End-to-End (SVG)
 ├── 📂 setup/
 │   ├── 📜 01_setup_control_tables.sql    # DDL: schema app_integration_zuora + 4 tablas de control/stage
 │   ├── 📜 02_seed_control_panel.sql      # MERGE idempotente del contrato zuora_tickets (52 columnas)
